@@ -502,12 +502,6 @@ static void xhci_hub_report_usb3_link_state(struct xhci_hcd *xhci,
 {
 	u32 pls = status_reg & PORT_PLS_MASK;
 
-	/* resume state is a xHCI internal state.
-	 * Do not report it to usb core.
-	 */
-	if (pls == XDEV_RESUME)
-		return;
-
 	/* When the CAS bit is set then warm reset
 	 * should be performed on port
 	 */
@@ -529,6 +523,13 @@ static void xhci_hub_report_usb3_link_state(struct xhci_hcd *xhci,
 		 */
 		pls |= USB_PORT_STAT_CONNECTION;
 	} else {
+		/*
+		 * resume state is a xHCI internal state.
+		 * Do not report it to usb core.
+		 */
+		if (pls == XDEV_RESUME)
+			return;
+
 		/*
 		 * If CAS bit isn't set but the Port is already at
 		 * Compliance Mode, fake a connection so the USB core
